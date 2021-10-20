@@ -183,6 +183,4 @@ if [ "${use_pip}" = "true" ]; then
     fi
 fi
 
- az extension add --name azure-devops
-
 echo "Done!"
