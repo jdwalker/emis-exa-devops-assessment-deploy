@@ -46,15 +46,21 @@ ENTRYPOINT [ "/usr/local/share/docker-init.sh" ]
 CMD [ "sleep", "infinity" ]
 
 # Install Powershell
-RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
-    && apt-get -y install --no-install-recommends powershell
+RUN mkdir -p /tmp/pwshdwnld && cd /tmp/pwshdwnld \
+    && wget https://packages.microsoft.com/config/debian/10/packages-microsoft-prod.deb \
+    && dpkg -i packages-microsoft-prod.deb \
+    && cd /tmp && rm -rf /tmp/pwshdwnld \
+    && apt-get update  \
+    && export DEBIAN_FRONTEND=noninteractive \
+    && apt-get -y install --no-install-recommends powershell \
+    && rm -rf /var/lib/apt/lists/*
 
 # Install AWS
 RUN mkdir -p /tmp/awscli/ \
     && cd /tmp/awscli/ \
     && curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "./awscliv2.zip" \
-    && unzip awscliv2.zip ./ \
-    && ./install \
+    && unzip awscliv2.zip  \
+    && ./aws/install \
     && cd /tmp \
     && rm -rf /tmp/awscli
 
