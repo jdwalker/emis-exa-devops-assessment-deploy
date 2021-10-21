@@ -4,8 +4,9 @@ $ErrorActionPreference = "Stop"
 
 function RunAndHaltOnFailure() {
     $command,$commandArgs = $args
-    & $command $commandArgs
+    $result = & $command $commandArgs
     if($LASTEXITCODE -ne 0) {  throw "Command '$command $commandArgs' failed!"}
+    return $result
 }
 
 $currentDirectory = Get-Location
@@ -17,6 +18,11 @@ Set-PsEnv
 
 Push-Location ./infrastructure/pipeline
 
+Write-Host "Login to team CI User"
+$tempDir = RunAndHaltOnFailure mktemp -d
+$env:AZURE_CONFIG_DIR=$tempDir
+RunAndHaltOnFailure az login --allow-no-subscriptions
+
 Write-Host "Initialising"
 
 RunAndHaltOnFailure terraform init `
@@ -26,7 +32,7 @@ RunAndHaltOnFailure terraform init `
     -reconfigure `
     -input=false
 
-$tempPath = mktemp
+$tempPath = RunAndHaltOnFailure mktemp
 
 Write-Host "Planning..."
 
