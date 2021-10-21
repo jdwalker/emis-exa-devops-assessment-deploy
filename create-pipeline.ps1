@@ -18,10 +18,26 @@ Set-PsEnv
 
 Push-Location ./infrastructure/pipeline
 
-Write-Host "Login to team CI User"
+if($env:AZURE_CLI_SKIP_FORCE_LOGIN -ne "true") {
+
+Write-Host "Login to team CI User, press any key to continue"
+$null = $Host.UI.RawUI.ReadKey('NoEcho,IncludeKeyDown');
 $tempDir = RunAndHaltOnFailure mktemp -d
+Write-Host "Storing temp azure config in '$tempDir'"
+
 $env:AZURE_CONFIG_DIR=$tempDir
-RunAndHaltOnFailure az login --allow-no-subscriptions
+RunAndHaltOnFailure az login --allow-no-subscriptions --tenant $env:ARM_TENANT_ID
+}
+
+Write-Host "Retrieving Azure Devops Token"
+
+# Generate temporary access_token for azure devops
+# Partially from https://gist.github.com/dylanberry/7c7c4e8746270fcee207981e5b0d9b10#file-azuredevops-get-pat-az-cli-ps1
+$azureDevopsResourceId = "499b84ac-1321-427f-aa17-267ca6975798"
+$token = RunAndHaltOnFailure az account get-access-token --resource $azureDevopsResourceId --tenant $env:ARM_TENANT_ID
+$token = ConvertFrom-Json ($token -join "")
+$env:AZDO_PERSONAL_ACCESS_TOKEN = $token.accessToken
+#$env:AZDO_PERSONAL_ACCESS_TOKEN = [Convert]::ToBase64String([System.Text.Encoding]::UTF8.GetBytes(":" + $token.accessToken))
 
 Write-Host "Initialising"
 
