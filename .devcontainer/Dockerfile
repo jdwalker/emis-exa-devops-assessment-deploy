@@ -66,3 +66,6 @@ RUN mkdir -p /tmp/awscli/ \
 
 # Add az devops extension
 RUN az extension add --name azure-devops --system
+
+# Add powershell psenv module
+RUN pwsh -c "Install-Module -Name Set-PsEnv -Scope AllUsers -Force"

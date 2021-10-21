@@ -13,6 +13,10 @@ We need the following preexisting resources (this can be set up by terraform, bu
 
 - An Azure Active Directory
 - An Azure Devops Organisation and Project
-- An Azure Devops Admin CI user
+- An Azure Devops Admin CI user credentialsv with AD access
+- A secure Azure blob for the terraform backend
 - An AWS account for our deployment environment
 
+# Setup
+Copy the local.env file to .env
+Fill in the .env details - this can be account level and not per user so the CI user doesn't need direct access to the backend subscription
