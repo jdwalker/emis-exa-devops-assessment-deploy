@@ -11,10 +11,16 @@ function RunAndHaltOnFailure() {
 
 $currentDirectory = Get-Location
 trap { Set-Location $currentDirectory }
+
+# Setup environment variables
 $ScriptDir = Split-Path $script:MyInvocation.MyCommand.Path
 $RepoDir = Join-Path $ScriptDir "."
 Push-Location $RepoDir
 Set-PsEnv
+
+Push-Location ./security
+Set-PsEnv
+Pop-Location
 
 Push-Location ./infrastructure/pipeline
 

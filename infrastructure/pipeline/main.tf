@@ -57,3 +57,40 @@ module "create_pat_token" {
   sensitive_outputs = true
 }
 
+locals {
+  aws_common_tags = {
+    agent_type = "ado"
+    agent_pool = var.azdevops_agent_pool_name
+  }
+}
+
+resource "aws_vpc" "main" {
+  cidr_block       = "10.0.0.0/16"
+  instance_tenancy = "default"
+
+  tags = local.aws_common_tags
+}
+
+resource "aws_resourcegroups_group" "rg" {
+  name = "rg-${var.azdevops_agent_pool_name}"
+  tags = local.aws_common_tags
+  resource_query {
+    query = <<JSON
+{
+  "ResourceTypeFilters": ["AWS::AllSupported"],
+  "TagFilters": [
+    {
+      "Key": "agent_pool",
+      "Values": ["${var.azdevops_agent_pool_name}"]
+    }
+  ]
+}
+JSON
+  }
+}
+
+resource "aws_subnet" "main" {
+  vpc_id     = aws_vpc.main.id
+  cidr_block = "10.0.1.0/24"
+  tags = local.aws_common_tags
+}

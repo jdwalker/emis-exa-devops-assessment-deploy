@@ -18,5 +18,8 @@ We need the following preexisting resources (this can be set up by terraform, bu
 - An AWS account for our deployment environment
 
 # Setup
-Copy the local.env file to .env
-Fill in the .env details - this can be account level and not per user so the CI user doesn't need direct access to the backend subscription
+
+- Copy the local.env file to .env
+ - Fill in the .env details - this can be account level and not per user so the CI user doesn't need direct access to the backend subscription
+  - Copy the security/security.env file to security/.env
+ - Fill in the .env details - this can be account level and not per user so the CI user doesn't need direct access to the backend subscription
