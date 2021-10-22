@@ -54,6 +54,10 @@ RunAndHaltOnFailure terraform init `
     -reconfigure `
     -input=false
 
+Write-Host "Downloading Modules"
+RunAndHaltOnFailure terraform get -update
+
+
 $tempPath = RunAndHaltOnFailure mktemp
 
 Write-Host "Planning..."
