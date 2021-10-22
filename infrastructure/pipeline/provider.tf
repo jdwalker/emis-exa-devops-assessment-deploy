@@ -8,9 +8,17 @@ terraform {
       source  = "hashicorp/aws"
       version = "~> 3.0"
     }
+    azurerm = {
+      source  = "hashicorp/azurerm"
+      version = "=2.46.0"
+    }
   }
 }
 
 provider "aws" {
   region = "eu-west-2"
+}
+
+provider "azurerm" {
+  features {}
 }

@@ -37,7 +37,7 @@ $azureDevopsResourceId = "499b84ac-1321-427f-aa17-267ca6975798"
 $token = RunAndHaltOnFailure az account get-access-token --resource $azureDevopsResourceId --tenant $env:ARM_TENANT_ID
 $token = ConvertFrom-Json ($token -join "")
 $env:AZDO_PERSONAL_ACCESS_TOKEN = $token.accessToken
-#$env:AZDO_PERSONAL_ACCESS_TOKEN = [Convert]::ToBase64String([System.Text.Encoding]::UTF8.GetBytes(":" + $token.accessToken))
+$env:AZDO_ORG_SERVICE_URL = "https://dev.azure.com/$env:TF_VAR_azdevops_organisation_name" 
 
 Write-Host "Initialising"
 
