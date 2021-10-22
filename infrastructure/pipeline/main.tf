@@ -57,6 +57,8 @@ module "create_pat_token" {
   sensitive_outputs = true
 }
 
+# AWS
+
 locals {
   aws_common_tags = {
     agent_type = "ado"
@@ -69,6 +71,34 @@ resource "aws_vpc" "main" {
   instance_tenancy = "default"
 
   tags = local.aws_common_tags
+}
+
+resource "aws_eip" "internet" {
+  vpc = true
+}
+
+resource "aws_subnet" "main" {
+  vpc_id     = aws_vpc.main.id
+  cidr_block = "10.0.1.0/24"
+  tags       = local.aws_common_tags
+}
+
+resource "aws_internet_gateway" "gw" {
+  vpc_id = aws_vpc.main.id
+  tags   = local.aws_common_tags
+}
+
+resource "aws_nat_gateway" "nat" {
+  allocation_id = aws_eip.internet.id
+  subnet_id     = aws_subnet.main.id
+
+  tags = merge(local.aws_common_tags, {
+    Name = "Gateway NAT"
+  })
+
+  # To ensure proper ordering, it is recommended to add an explicit dependency
+  # on the Internet Gateway for the VPC.
+  depends_on = [aws_internet_gateway.gw]
 }
 
 resource "aws_resourcegroups_group" "rg" {
@@ -88,11 +118,6 @@ resource "aws_resourcegroups_group" "rg" {
   }
 }
 
-resource "aws_subnet" "main" {
-  vpc_id     = aws_vpc.main.id
-  cidr_block = "10.0.1.0/24"
-  tags       = local.aws_common_tags
-}
 
 
 # Generate private key for key pair
@@ -127,4 +152,7 @@ module "selfhostedagent" {
   asg_desired_size  = 1
   tags              = local.aws_common_tags
   ami_id            = "ami-0194c3e07668a7e36"
+  depends_on = [
+    aws_nat_gateway.nat
+  ]
 }
